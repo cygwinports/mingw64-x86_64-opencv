@@ -1,0 +1,74 @@
+CROSS_HOST="x86_64-w64-mingw32"
+inherit cross cmake
+
+NAME="mingw64-x86_64-opencv"
+VERSION=3.2.0
+RELEASE=1
+CATEGORY="Devel"
+SUMMARY="Real-time computer vision library for Win64 toolchain"
+DESCRIPTION="OpenCV (Open Source Computer Vision) is a library of programming
+functions for real time computer vision. Example applications of the OpenCV
+library are Human-Computer Interaction; Object Identification, Segmentation and
+Recognition; Face Recognition; Gesture Recognition; Camera and Motion Tracking,
+Ego Motion, Motion Understanding; Structure From Motion; Stereo and
+Multi-Camera Calibration and Depth Computation; Mobile Robotics."
+HOMEPAGE="http://opencv.org/"
+#SRC_URI="https://github.com/opencv/opencv/archive/${VERSION}/opencv-${VERSION}.tar.gz"
+sum1=9f7e25f2f570c08d37bc996dbf38768ab43c2312aacfd00a31c82d8a55caeb57d4039db98579032e157f64c3173bfe995d3ca53212f34e764baa54415dd93f93
+sum2=dd1abe177f22cdb9f03c063310eb61d205841a74dd9f9e9bdc96e40ce766cc25bdfebd40bb3e226834c8b4a6c8b741f3957257b2fdd95f67a980258f7cdc654b
+SRC_URI="
+	http://pkgs.fedoraproject.org/repo/pkgs/opencv/opencv-clean-${VERSION}.tar.gz/sha512/${sum1}/opencv-clean-${VERSION}.tar.gz
+	http://pkgs.fedoraproject.org/repo/pkgs/opencv/opencv_contrib-clean-${VERSION}.tar.gz/sha512/${sum2}/opencv_contrib-clean-${VERSION}.tar.gz
+"
+SRC_DIR="opencv-${VERSION}"
+PATCH_URI="
+	3.2.0-freetype-no-undefined.patch
+	3.2.0-mingw.patch
+"
+
+CYGPORT_USE_UNSTABLE_API=1
+src_unpack_hook() {
+	for d in ../opencv_contrib-${VERSION}/modules/*
+	do
+		[ ! -e modules/${d##*/} ] || find modules/${d##*/} -delete
+		mv $d modules/
+	done
+}
+
+CPPFLAGS+=" -DDBL_EPSILON=__DBL_EPSILON__ -DFLT_EPSILON=__FLT_EPSILON__ -DLDBL_EPSILON=__LDBL_EPSILON__"
+CYGCMAKE_ARGS="
+	-DBUILD_PERF_TESTS=OFF
+	-DBUILD_TESTS=OFF
+	-DBUILD_opencv_dnn=OFF
+	-DBUILD_opencv_java=OFF
+	-DBUILD_opencv_python=OFF
+	-DBUILD_opencv_nonfree=OFF
+	-DBUILD_JASPER=OFF
+	-DBUILD_JPEG=OFF
+	-DBUILD_OPENEXR=OFF
+	-DBUILD_PNG=OFF
+	-DBUILD_TIFF=OFF
+	-DBUILD_ZLIB=OFF
+	-DENABLE_PRECOMPILED_HEADERS=OFF
+	-DOPENCV_CONFIG_INSTALL_PATH=lib/cmake/OpenCV
+	-DWITH_1394=OFF
+	-DWITH_CAROTENE=OFF
+	-DWITH_FFMPEG=OFF
+	-DWITH_GSTREAMER=OFF
+	-DWITH_IPP=OFF
+	-DWITH_UNICAP=OFF
+	-DWITH_V4L=OFF
+	-DWITH_VFW=ON
+	-DWITH_XINE=OFF
+"
+
+src_install() {
+	cd ${B}
+	cyginstall
+
+	pushd ${D}${CROSS_LIBDIR}
+	rename ${VERSION//.}.dll.a .dll.a lib*.dll.a
+	sed -i -e "s|${VERSION//.}\(\.dll\.a\)|\1|g" cmake/OpenCV/OpenCVModules-*.cmake
+	sed -i -e "/^Libs/s|${VERSION//.}||g" pkgconfig/opencv.pc
+	popd
+}

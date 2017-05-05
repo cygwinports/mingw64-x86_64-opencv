@@ -1,0 +1,20 @@
+--- origsrc/opencv-3.2.0/cmake/OpenCVGenPkgconfig.cmake	2016-12-23 06:54:44.000000000 -0600
++++ src/opencv-3.2.0/cmake/OpenCVGenPkgconfig.cmake	2017-05-05 02:36:15.567930600 -0500
+@@ -95,6 +95,6 @@ configure_file("${OpenCV_SOURCE_DIR}/cma
+                "${CMAKE_BINARY_DIR}/unix-install/${OPENCV_PC_FILE_NAME}"
+                @ONLY)
+ 
+-if(UNIX AND NOT ANDROID)
++if(NOT MSVC AND NOT ANDROID)
+   install(FILES ${CMAKE_BINARY_DIR}/unix-install/${OPENCV_PC_FILE_NAME} DESTINATION ${OPENCV_LIB_INSTALL_PATH}/pkgconfig COMPONENT dev)
+ endif()
+--- origsrc/opencv-3.2.0/modules/imgcodecs/src/grfmt_jpeg2000.cpp	2016-12-23 06:54:44.000000000 -0600
++++ src/opencv-3.2.0/modules/imgcodecs/src/grfmt_jpeg2000.cpp	2017-05-05 02:23:55.480170600 -0500
+@@ -40,6 +40,7 @@
+ //
+ //M*/
+ 
++#define __STDC_LIMIT_MACROS
+ #include "precomp.hpp"
+ 
+ #ifdef HAVE_JASPER
