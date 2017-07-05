@@ -3,7 +3,7 @@ inherit cross cmake
 
 NAME="mingw64-x86_64-opencv"
 VERSION=3.2.0
-RELEASE=1
+RELEASE=2
 CATEGORY="Devel"
 SUMMARY="Real-time computer vision library for Win64 toolchain"
 DESCRIPTION="OpenCV (Open Source Computer Vision) is a library of programming
