@@ -1,0 +1,61 @@
+--- origsrc/opencv-3.4.1/cmake/OpenCVPCHSupport.cmake	2018-02-23 02:38:33.000000000 -0600
++++ src/opencv-3.4.1/cmake/OpenCVPCHSupport.cmake	2018-04-08 22:39:42.366096300 -0500
+@@ -77,6 +77,9 @@ MACRO(_PCH_GET_COMPILE_FLAGS _out_compil
+         elseif(CMAKE_COMPILER_IS_GNUCXX AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "6.0" AND
+                item MATCHES "/usr/include$")
+           # workaround for GCC 6.x bug
++        elseif(CMAKE_COMPILER_IS_GNUCXX AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "6.0" AND
++               item MATCHES "/mingw/include$")
++          # workaround for GCC 6.x bug
+         else()
+           LIST(APPEND ${_out_compile_flags} "${_PCH_isystem_prefix}\"${item}\"")
+         endif()
+@@ -90,6 +93,9 @@ MACRO(_PCH_GET_COMPILE_FLAGS _out_compil
+         elseif(CMAKE_COMPILER_IS_GNUCXX AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "6.0" AND
+                item MATCHES "/usr/include$")
+           # workaround for GCC 6.x bug
++        elseif(CMAKE_COMPILER_IS_GNUCXX AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "6.0" AND
++               item MATCHES "/mingw/include$")
++          # workaround for GCC 6.x bug
+         else()
+           LIST(APPEND ${_out_compile_flags} "${_PCH_isystem_prefix}\"${item}\"")
+         endif()
+--- origsrc/opencv-3.4.1/cmake/OpenCVUtils.cmake	2018-04-09 12:46:16.168580700 -0500
++++ src/opencv-3.4.1/cmake/OpenCVUtils.cmake	2018-04-09 12:46:26.282994800 -0500
+@@ -206,6 +206,9 @@ function(ocv_include_directories)
+     elseif(CMAKE_COMPILER_IS_GNUCXX AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "6.0" AND
+            dir MATCHES "/usr/include$")
+       # workaround for GCC 6.x bug
++    elseif(CMAKE_COMPILER_IS_GNUCXX AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "6.0" AND
++           dir MATCHES "/mingw/include$")
++      # workaround for GCC 6.x bug
+     else()
+       include_directories(AFTER SYSTEM "${dir}")
+     endif()
+@@ -237,6 +240,9 @@ function(ocv_target_include_directories
+   if(CMAKE_COMPILER_IS_GNUCXX AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "6.0" AND
+       ";${ARGN};" MATCHES "/usr/include;")
+     return() # workaround for GCC 6.x bug
++  elseif(CMAKE_COMPILER_IS_GNUCXX AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "6.0" AND
++      ";${ARGN};" MATCHES "/mingw/include;")
++    return() # workaround for GCC 6.x bug
+   endif()
+   set(__params "")
+   set(__system_params "")
+--- origsrc/opencv-3.4.1/modules/imgcodecs/CMakeLists.txt	2018-02-23 02:38:33.000000000 -0600
++++ src/opencv-3.4.1/modules/imgcodecs/CMakeLists.txt	2018-04-09 12:01:28.331418800 -0500
+@@ -51,12 +51,12 @@ if(HAVE_JASPER)
+ endif()
+ 
+ if(HAVE_OPENEXR)
+-  include_directories(SYSTEM ${OPENEXR_INCLUDE_PATHS})
++  include_directories(${OPENEXR_INCLUDE_PATHS})
+   list(APPEND GRFMT_LIBS ${OPENEXR_LIBRARIES})
+ endif()
+ 
+ if(HAVE_GDAL)
+-  include_directories(SYSTEM ${GDAL_INCLUDE_DIR})
++  include_directories(${GDAL_INCLUDE_DIR})
+   list(APPEND GRFMT_LIBS ${GDAL_LIBRARY})
+ endif()
+ 
